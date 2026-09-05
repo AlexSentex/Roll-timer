@@ -24,7 +24,7 @@ class SettingsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivitySettingsBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        volumeControlStream = AudioManager.STREAM_ALARM
+        volumeControlStream = AudioManager.STREAM_MUSIC
 
         binding.backButton.setOnClickListener { finish() }
 
@@ -37,12 +37,12 @@ class SettingsActivity : AppCompatActivity() {
         binding.exactAlarmButton.setOnClickListener { requestExactAlarmPermission() }
 
         val am = getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        val max = am.getStreamMaxVolume(AudioManager.STREAM_ALARM)
+        val max = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
         binding.volumeSeekBar.max = max
-        binding.volumeSeekBar.progress = am.getStreamVolume(AudioManager.STREAM_ALARM)
+        binding.volumeSeekBar.progress = am.getStreamVolume(AudioManager.STREAM_MUSIC)
         binding.volumeSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                if (fromUser) am.setStreamVolume(AudioManager.STREAM_ALARM, progress, 0)
+                if (fromUser) am.setStreamVolume(AudioManager.STREAM_MUSIC, progress, 0)
             }
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
