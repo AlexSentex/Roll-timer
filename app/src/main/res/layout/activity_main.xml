@@ -60,6 +60,32 @@
         android:backgroundTint="@color/colorPrimary"
         android:textColor="#FFFFFF" />
 
+</LinearLayout>        android:padding="24dp"
+        android:textColor="#9AA1AC"
+        android:visibility="gone"
+        android:text="Ще немає жодного таймера.\nНатисніть «+ Додати таймер» знизу." />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+        <LinearLayout
+            android:id="@+id/dashboardList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="12dp" />
+    </ScrollView>
+
+    <Button
+        android:id="@+id/addButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="12dp"
+        android:text="+ Додати таймер"
+        android:backgroundTint="@color/colorPrimary"
+        android:textColor="#FFFFFF" />
+
 </LinearLayout>                    android:id="@+id/wakeStatusText"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
