@@ -146,36 +146,4 @@ object SoundSignals {
             try { tg.release() } catch (e: Exception) { }
         }, delay + 300)
     }
-}        )
-        3 -> listOf(
-            Triple(ToneGenerator.TONE_CDMA_ABBR_ALERT, 200, 120),
-            Triple(ToneGenerator.TONE_CDMA_ABBR_ALERT, 200, 300),
-            Triple(ToneGenerator.TONE_CDMA_ABBR_ALERT, 200, 120),
-            Triple(ToneGenerator.TONE_CDMA_ABBR_ALERT, 200, 0)
-        )
-        else -> listOf(
-            Triple(ToneGenerator.TONE_PROP_ACK, 300, 60),
-            Triple(ToneGenerator.TONE_PROP_ACK, 500, 0)
-        )
-    }
-
-    fun play(signalIndex: Int) {
-        val steps = pattern(signalIndex)
-        val tg = try {
-            ToneGenerator(AudioManager.STREAM_ALARM, 100)
-        } catch (e: Exception) {
-            return
-        }
-        val handler = Handler(Looper.getMainLooper())
-        var delay = 0L
-        for ((tone, dur, gap) in steps) {
-            handler.postDelayed({
-                try { tg.startTone(tone, dur) } catch (e: Exception) { }
-            }, delay)
-            delay += dur + gap
-        }
-        handler.postDelayed({
-            try { tg.release() } catch (e: Exception) { }
-        }, delay + 300)
-    }
 }
