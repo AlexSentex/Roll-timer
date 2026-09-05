@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorBackground">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="14dp">
+            <Button
+                android:id="@+id/backButton"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/colorOnSurface"
+                android:text="← Назад" />
+            <TextView
+                android:id="@+id/titleText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:textColor="@color/colorOnSurface"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:text="Таймер" />
+            <Button
+                android:id="@+id/deleteButton"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#FF5B5B"
+                android:text="Видалити ✕" />
+        </LinearLayout>
+
+        <EditText
+            android:id="@+id/nameEdit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorOnSurface"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:hint="Назва таймера"
+            android:layout_marginBottom="14dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/colorSurface"
+            android:padding="12dp"
+            android:layout_marginBottom="14dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1. Калібрування швидкості"
+                android:textColor="#9AA1AC"
+                android:textSize="12sp"
+                android:layout_marginBottom="6dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="6dp">
+                <Button
+                    android:id="@+id/calibStartButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Почати замір" />
+                <TextView
+                    android:id="@+id/calibElapsedText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:textColor="@color/colorOnSurface"
+                    android:text="00:00" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="6dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#9AA1AC"
+                    android:text="Проїхало, м:" />
+                <EditText
+                    android:id="@+id/calibMetersEdit"
+                    android:layout_width="70dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:inputType="numberDecimal"
+                    android:text="10" />
+                <Button
+                    android:id="@+id/calibMarkButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="Позначити" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="4dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#9AA1AC"
+                    android:text="або вручну, м/с:" />
+                <EditText
+                    android:id="@+id/speedManualEdit"
+                    android:layout_width="90dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:inputType="numberDecimal"
+                    android:hint="0.8" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/speedInfoText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="#9AA1AC"
+                android:textSize="12.5sp"
+                android:text="Швидкість: не визначена" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/colorSurface"
+            android:padding="12dp"
+            android:layout_marginBottom="14dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="2. Параметри рулону"
+                android:textColor="#9AA1AC"
+                android:textSize="12sp"
+                android:layout_marginBottom="6dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="6dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#9AA1AC"
+                    android:text="Довжина, м:" />
+                <EditText
+                    android:id="@+id/totalLengthEdit"
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:inputType="numberDecimal"
+                    android:text="100" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="8dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#9AA1AC"
+                    android:text="Вже проїхало (1-й цикл), м:" />
+                <EditText
+                    android:id="@+id/alreadyPassedEdit"
+                    android:layout_width="70dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:inputType="numberDecimal"
+                    android:text="0" />
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/computeButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Порахувати час" />
+
+            <TextView
+                android:id="@+id/fullTimeInfoText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="#9AA1AC"
+                android:textSize="12.5sp"
+                android:text="Повний час рулону: —"
+                android:layout_marginTop="4dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/colorSurface"
+            android:padding="12dp"
+            android:layout_marginBottom="14dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="3. Сигнал"
+                android:textColor="#9AA1AC"
+                android:textSize="12sp"
+                android:layout_marginBottom="6dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+                <Spinner
+                    android:id="@+id/signalSpinner"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
+                <Button
+                    android:id="@+id/listenButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="🔊 Прослухати" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@color/colorBackground"
+            android:padding="14dp"
+            android:layout_marginBottom="12dp">
+            <TextView
+                android:id="@+id/displayText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textColor="@color/colorOnSurface"
+                android:textSize="30sp"
+                android:textStyle="bold"
+                android:text="--:--" />
+            <TextView
+                android:id="@+id/cycleText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#9AA1AC"
+                android:text="Рулон №1" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <Button
+                android:id="@+id/startButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:backgroundTint="@color/colorAccent"
+                android:textColor="#FFFFFF"
+                android:text="▶ Старт" />
+            <Button
+                android:id="@+id/pauseButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="6dp"
+                android:enabled="false"
+                android:text="⏸ Пауза" />
+            <Button
+                android:id="@+id/resetButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="6dp"
+                android:text="↺ Скинути" />
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>
