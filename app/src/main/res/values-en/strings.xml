@@ -41,6 +41,7 @@
     <string name="keep_screen_label">💡 Keep screen on</string>
     <string name="notif_off">🔔 Notifications off</string>
     <string name="notif_on">🔔 Notifications on</string>
+    <string name="notifications_enabled_label">🔔 Show notifications</string>
     <string name="allow_button">Allow</string>
     <string name="exact_alarm_off">⏰ Exact alarms not allowed</string>
     <string name="exact_alarm_on">⏰ Exact alarms allowed</string>
