@@ -92,15 +92,19 @@ class MainActivity : AppCompatActivity() {
         val d = holder.data
         val b = holder.binding
         b.rowNameText.text = d.name
-        b.rowCycleText.text = "Рулон №${d.cycle}"
+        b.rowCycleText.text = getString(R.string.roll_label_fmt, d.cycle)
 
         if (!d.running) {
             b.rowTimeText.text = "--:--"
             b.statusDot.setBackgroundResource(R.drawable.dot_grey)
+            b.rowMetersText.text = if (d.pausedRemainingMs > 0 && d.speed > 0) {
+                metersProgressText(d, d.pausedRemainingMs / 1000.0)
+            } else ""
             return
         }
         val remaining = ((d.endTimestamp - System.currentTimeMillis()) / 1000.0).coerceAtLeast(0.0)
         b.rowTimeText.text = TimeFmt.format(remaining)
+        b.rowMetersText.text = if (d.speed > 0) metersProgressText(d, remaining) else ""
         b.statusDot.setBackgroundResource(
             when {
                 remaining <= 60 -> R.drawable.dot_red
@@ -108,6 +112,16 @@ class MainActivity : AppCompatActivity() {
                 else -> R.drawable.dot_green
             }
         )
+    }
+
+    private fun metersProgressText(d: TimerData, remainingSec: Double): String {
+        val metersPassed = (d.totalLength - remainingSec * d.speed).coerceIn(0.0, d.totalLength)
+        return getString(R.string.meters_progress_fmt, fmtMeters(metersPassed), fmtMeters(d.totalLength))
+    }
+
+    private fun fmtMeters(v: Double): String {
+        val rounded = Math.round(v * 10) / 10.0
+        return if (rounded == rounded.toLong().toDouble()) rounded.toLong().toString() else "%.1f".format(rounded)
     }
 
     private fun openDetail(id: String) {
@@ -118,7 +132,7 @@ class MainActivity : AppCompatActivity() {
         val all = TimerStore.loadAll(this)
         val data = TimerData(
             id = UUID.randomUUID().toString(),
-            name = "Плівка ${all.size + 1}",
+            name = getString(R.string.new_timer_default_name_fmt, all.size + 1),
             speed = 0.0,
             totalLength = 100.0,
             alreadyPassed = 0.0,
