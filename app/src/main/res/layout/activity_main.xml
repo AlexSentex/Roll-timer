@@ -37,7 +37,7 @@
         android:padding="24dp"
         android:textColor="#9AA1AC"
         android:visibility="gone"
-        android:text="@string/dashboard_empty"
+        android:text="@string/dashboard_empty" />
 
     <ScrollView
         android:layout_width="match_parent"
