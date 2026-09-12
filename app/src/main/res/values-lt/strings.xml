@@ -1,0 +1,72 @@
+<resources>
+    <string name="app_name">Roll Timer</string>
+    <string name="default_timer_name">Laikmatis</string>
+
+    <string name="dashboard_title">⏱ Ritinių laikmačiai</string>
+    <string name="dashboard_empty">Kol kas nėra laikmačių.\nPaspauskite „+ Pridėti laikmatį“ apačioje.</string>
+    <string name="add_timer_button">+ Pridėti laikmatį</string>
+    <string name="roll_label_fmt">Ritinys Nr. %1$d</string>
+    <string name="new_timer_default_name_fmt">Plėvelė %1$d</string>
+
+    <string name="back_button">← Atgal</string>
+    <string name="delete_button">Ištrinti ✕</string>
+    <string name="name_hint">Laikmačio pavadinimas</string>
+    <string name="section_calibration">1. Greičio kalibravimas</string>
+    <string name="calib_start_button">Pradėti matavimą</string>
+    <string name="calib_meters_label">Nuvažiuota, m:</string>
+    <string name="calib_mark_button">Pažymėti</string>
+    <string name="speed_manual_label">arba rankiniu būdu, m/s:</string>
+    <string name="speed_manual_hint">0.8</string>
+    <string name="speed_info_unknown">Greitis: nenustatytas</string>
+    <string name="speed_info_calibrated_fmt">Greitis: %1$s m/s (%2$s m per %3$s s)</string>
+    <string name="speed_info_manual_fmt">Greitis (rankinis): %1$s m/s</string>
+    <string name="section_roll_params">2. Ritinio parametrai</string>
+    <string name="total_length_label">Ilgis, m:</string>
+    <string name="already_passed_label">Jau nuvažiuota (1-as ciklas), m:</string>
+    <string name="meters_progress_fmt">%1$s / %2$s m</string>
+    <string name="compute_button">Apskaičiuoti laiką</string>
+    <string name="full_time_unknown">Pilnas ritinio laikas: —</string>
+    <string name="full_time_computed_fmt">Pilnas ritinio laikas: %1$s</string>
+    <string name="section_signal">3. Signalas</string>
+    <string name="listen_button">🔊 Klausyti</string>
+    <string name="start_button">▶ Pradėti</string>
+    <string name="pause_button">⏸ Pauzė</string>
+    <string name="resume_button">▶ Tęsti</string>
+    <string name="reset_button">↺ Atstatyti</string>
+    <string name="error_invalid_meters">Įveskite teisingą metrų skaičių (&gt;0).</string>
+    <string name="error_no_speed">Pirmiausia nustatykite greitį (matavimu arba rankiniu būdu).</string>
+    <string name="error_invalid_length">Įveskite teisingą ritinio ilgį (&gt;0).</string>
+
+    <string name="settings_title">Nustatymai</string>
+    <string name="keep_screen_label">💡 Neleisti ekranui užgesti</string>
+    <string name="notif_off">🔔 Pranešimai išjungti</string>
+    <string name="notif_on">🔔 Pranešimai įjungti</string>
+    <string name="allow_button">Leisti</string>
+    <string name="exact_alarm_off">⏰ Tikslūs žadintuvai neleidžiami</string>
+    <string name="exact_alarm_on">⏰ Tikslūs žadintuvai leidžiami</string>
+    <string name="volume_label">🔊 Signalo garsumas (medija)</string>
+    <string name="test_signal_button">🔊 Bandomasis signalas</string>
+    <string name="language_label">🌐 Kalba</string>
+
+    <string name="notif_title_fmt">%1$s: ritinys baigėsi</string>
+    <string name="notif_text_fmt">Laikas baigėsi — laikas keisti ritinį (ciklas %1$d).</string>
+    <string name="notif_channel_name">Ritinio laikmačio signalai</string>
+
+    <string-array name="signal_names">
+        <item>Trys trumpi pypsėjimai</item>
+        <item>Vienas ilgas pyptelėjimas</item>
+        <item>Kylantis trelis (4 natos)</item>
+        <item>Greiti dvigubi pypsėjimai</item>
+        <item>Švelnus dvigubas signalas</item>
+        <item>Krintantis trelis (4 natos)</item>
+        <item>Du ilgi pypsėjimai</item>
+        <item>Penki greiti pypsėjimai</item>
+        <item>Skambučio trelis</item>
+        <item>SOS (trumpai-ilgai-trumpai)</item>
+        <item>Kylanti gama (5 natos)</item>
+        <item>Krintanti gama (5 natos)</item>
+        <item>Dvigubas pyp-pyp</item>
+        <item>Patvirtinimo akordas</item>
+        <item>Aukšto-žemo kaitaliojimas</item>
+    </string-array>
+</resources>
