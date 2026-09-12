@@ -2,6 +2,7 @@
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="10dp"
@@ -36,14 +37,21 @@
                 android:textColor="@color/colorOnSurface"
                 android:textSize="15sp"
                 android:textStyle="bold"
-                android:text="Плівка" />
+                tools:text="Film" />
             <TextView
                 android:id="@+id/rowCycleText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#9AA1AC"
                 android:textSize="12sp"
-                android:text="Рулон №1" />
+                tools:text="Roll #1" />
+            <TextView
+                android:id="@+id/rowMetersText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#9AA1AC"
+                android:textSize="11.5sp"
+                tools:text="42 / 100 м" />
         </LinearLayout>
 
         <TextView
