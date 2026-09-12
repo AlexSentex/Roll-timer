@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Список мов, які офіційно підтримує застосунок. Щоб додати нову мову
+     пізніше: (1) додати сюди рядок locale, (2) створити values-XX/strings.xml,
+     (3) додати пункт у список LANGUAGES у SettingsActivity.kt -->
+<locale-config xmlns:android="http://schemas.android.com/apk/res/android">
+    <locale android:name="uk" />
+    <locale android:name="en" />
+    <locale android:name="lt" />
+</locale-config>
