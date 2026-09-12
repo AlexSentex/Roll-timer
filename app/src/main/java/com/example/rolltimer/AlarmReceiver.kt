@@ -20,14 +20,16 @@ class AlarmReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         val id = intent.getStringExtra(EXTRA_ID) ?: return
-        val name = intent.getStringExtra(EXTRA_NAME) ?: "Таймер"
+        val name = intent.getStringExtra(EXTRA_NAME) ?: context.getString(R.string.default_timer_name)
         val speed = intent.getDoubleExtra(EXTRA_SPEED, 0.0)
         val totalLength = intent.getDoubleExtra(EXTRA_TOTAL_LENGTH, 0.0)
         val signalIndex = intent.getIntExtra(EXTRA_SIGNAL, 0)
         val cycle = intent.getIntExtra(EXTRA_CYCLE, 1)
 
         SoundSignals.play(context, signalIndex)
-        showNotification(context, id, name, cycle)
+        if (SettingsStore.isNotificationsEnabled(context)) {
+            showNotification(context, id, name, cycle)
+        }
 
         val fullTimeMs = if (speed > 0) (totalLength / speed * 1000).toLong() else 0L
         if (fullTimeMs > 0) {
@@ -43,7 +45,7 @@ class AlarmReceiver : BroadcastReceiver() {
         val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
-                CHANNEL_ID, "Сигнали таймера рулонів",
+                CHANNEL_ID, context.getString(R.string.notif_channel_name),
                 NotificationManager.IMPORTANCE_HIGH
             )
             nm.createNotificationChannel(channel)
@@ -59,8 +61,8 @@ class AlarmReceiver : BroadcastReceiver() {
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification)
-            .setContentTitle("$name: рулон закінчився")
-            .setContentText("Час вийшов — час міняти рулон (цикл $cycle).")
+            .setContentTitle(context.getString(R.string.notif_title_fmt, name))
+            .setContentText(context.getString(R.string.notif_text_fmt, cycle))
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
             .setContentIntent(contentPI)
