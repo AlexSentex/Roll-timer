@@ -5,7 +5,6 @@ import android.os.Handler
 import android.os.Looper
 import android.widget.ArrayAdapter
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doAfterTextChanged
 import com.example.rolltimer.databinding.ActivityTimerDetailBinding
 
@@ -17,7 +16,7 @@ import com.example.rolltimer.databinding.ActivityTimerDetailBinding
  * залишок часу на момент паузи — при відновленні відлік продовжується
  * рівно з того місця, а не рахується заново.
  */
-class TimerDetailActivity : AppCompatActivity() {
+class TimerDetailActivity : LocaleAwareActivity() {
 
     private lateinit var binding: ActivityTimerDetailBinding
     private lateinit var data: TimerData
