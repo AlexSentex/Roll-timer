@@ -17,7 +17,8 @@ data class TimerData(
     var signalIndex: Int,
     var cycle: Int,
     var endTimestamp: Long,    // час закінчення поточного циклу (мс, epoch); 0 якщо не запущено
-    var running: Boolean
+    var running: Boolean,
+    var pausedRemainingMs: Long = 0L  // залишок часу на момент паузи (0 = не на паузі)
 )
 
 object TimerStore {
@@ -41,7 +42,8 @@ object TimerStore {
                     signalIndex = o.optInt("signalIndex", 0),
                     cycle = o.optInt("cycle", 1),
                     endTimestamp = o.optLong("endTimestamp", 0L),
-                    running = o.optBoolean("running", false)
+                    running = o.optBoolean("running", false),
+                    pausedRemainingMs = o.optLong("pausedRemainingMs", 0L)
                 )
             )
         }
@@ -61,6 +63,7 @@ object TimerStore {
             o.put("cycle", t.cycle)
             o.put("endTimestamp", t.endTimestamp)
             o.put("running", t.running)
+            o.put("pausedRemainingMs", t.pausedRemainingMs)
             arr.put(o)
         }
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
