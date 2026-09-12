@@ -5,13 +5,12 @@ import android.media.AudioManager
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import androidx.appcompat.app.AppCompatActivity
 import com.example.rolltimer.databinding.ActivityMainBinding
 import com.example.rolltimer.databinding.TimerRowBinding
 import java.util.UUID
 
 /** Дешборд: список усіх таймерів одразу видно, чи скоро треба міняти рулон. */
-class MainActivity : AppCompatActivity() {
+class MainActivity : LocaleAwareActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private val handler = Handler(Looper.getMainLooper())
