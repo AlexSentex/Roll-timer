@@ -41,6 +41,7 @@
     <string name="keep_screen_label">💡 Не вимикати екран</string>
     <string name="notif_off">🔔 Сповіщення вимкнено</string>
     <string name="notif_on">🔔 Сповіщення увімкнено</string>
+    <string name="notifications_enabled_label">🔔 Показувати сповіщення</string>
     <string name="allow_button">Дозволити</string>
     <string name="exact_alarm_off">⏰ Точні будильники не дозволені</string>
     <string name="exact_alarm_on">⏰ Точні будильники дозволені</string>
