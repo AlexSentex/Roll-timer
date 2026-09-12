@@ -12,7 +12,6 @@ import android.os.Bundle
 import android.provider.Settings
 import android.view.View
 import android.widget.SeekBar
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.core.os.LocaleListCompat
@@ -20,7 +19,7 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import com.example.rolltimer.databinding.ActivitySettingsBinding
 
-class SettingsActivity : AppCompatActivity() {
+class SettingsActivity : LocaleAwareActivity() {
 
     private lateinit var binding: ActivitySettingsBinding
 
@@ -46,6 +45,11 @@ class SettingsActivity : AppCompatActivity() {
         binding.keepScreenSwitch.isChecked = SettingsStore.isKeepScreenOn(this)
         binding.keepScreenSwitch.setOnCheckedChangeListener { _, checked ->
             SettingsStore.setKeepScreenOn(this, checked)
+        }
+
+        binding.notificationsEnabledSwitch.isChecked = SettingsStore.isNotificationsEnabled(this)
+        binding.notificationsEnabledSwitch.setOnCheckedChangeListener { _, checked ->
+            SettingsStore.setNotificationsEnabled(this, checked)
         }
 
         binding.notifButton.setOnClickListener { requestNotifPermission() }
