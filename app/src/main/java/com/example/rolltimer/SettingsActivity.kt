@@ -13,12 +13,25 @@ import android.provider.Settings
 import android.view.View
 import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
+import androidx.core.os.LocaleListCompat
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import com.example.rolltimer.databinding.ActivitySettingsBinding
 
 class SettingsActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySettingsBinding
+
+    // Список підтримуваних мов: (тег локалі, назва мовою оригіналу).
+    // Щоб додати нову мову: сюди новий рядок + values-XX/strings.xml +
+    // рядок у app/src/main/res/xml/locales_config.xml.
+    private val languages = listOf(
+        "uk" to "Українська",
+        "en" to "English",
+        "lt" to "Lietuvių"
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,6 +40,8 @@ class SettingsActivity : AppCompatActivity() {
         volumeControlStream = AudioManager.STREAM_MUSIC
 
         binding.backButton.setOnClickListener { finish() }
+
+        setupLanguageSpinner()
 
         binding.keepScreenSwitch.isChecked = SettingsStore.isKeepScreenOn(this)
         binding.keepScreenSwitch.setOnCheckedChangeListener { _, checked ->
@@ -56,6 +71,29 @@ class SettingsActivity : AppCompatActivity() {
         updateExactAlarmUi()
     }
 
+    private fun setupLanguageSpinner() {
+        val adapter = ArrayAdapter(
+            this, android.R.layout.simple_spinner_dropdown_item, languages.map { it.second }
+        )
+        binding.languageSpinner.adapter = adapter
+
+        val currentTag = AppCompatDelegate.getApplicationLocales()
+            .toLanguageTags()
+            .substringBefore("-")
+            .ifBlank { "uk" }
+        val currentIndex = languages.indexOfFirst { it.first == currentTag }.let { if (it >= 0) it else 0 }
+        binding.languageSpinner.setSelection(currentIndex)
+
+        // Слухач ставимо ПІСЛЯ setSelection, щоб не спрацював одразу при відкритті екрана
+        binding.languageSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: android.view.View?, position: Int, id: Long) {
+                val tag = languages[position].first
+                AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(tag))
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+    }
+
     private fun requestNotifPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
@@ -79,10 +117,10 @@ class SettingsActivity : AppCompatActivity() {
                 ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) ==
                 PackageManager.PERMISSION_GRANTED
         if (granted) {
-            binding.notifStatusText.text = "🔔 Сповіщення увімкнено"
+            binding.notifStatusText.text = getString(R.string.notif_on)
             binding.notifButton.visibility = View.GONE
         } else {
-            binding.notifStatusText.text = "🔔 Сповіщення вимкнено"
+            binding.notifStatusText.text = getString(R.string.notif_off)
             binding.notifButton.visibility = View.VISIBLE
         }
     }
@@ -100,10 +138,10 @@ class SettingsActivity : AppCompatActivity() {
         val am = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val ok = Build.VERSION.SDK_INT < Build.VERSION_CODES.S || am.canScheduleExactAlarms()
         if (ok) {
-            binding.exactAlarmStatusText.text = "⏰ Точні будильники дозволені"
+            binding.exactAlarmStatusText.text = getString(R.string.exact_alarm_on)
             binding.exactAlarmButton.visibility = View.GONE
         } else {
-            binding.exactAlarmStatusText.text = "⏰ Точні будильники не дозволені"
+            binding.exactAlarmStatusText.text = getString(R.string.exact_alarm_off)
             binding.exactAlarmButton.visibility = View.VISIBLE
         }
     }
