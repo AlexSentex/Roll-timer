@@ -9,7 +9,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doAfterTextChanged
 import com.example.rolltimer.databinding.ActivityTimerDetailBinding
 
-/** Повні налаштування й керування одним таймером: калібрування, довжина, сигнал, старт/пауза. */
+/**
+ * Повні налаштування й керування одним таймером: калібрування, довжина, сигнал.
+ *
+ * «Старт» завжди починає цикл заново (з урахуванням "вже проїхало" для 1-го циклу).
+ * «Пауза» сама перемикається на «Продовжити» (і навпаки) і памʼятає точний
+ * залишок часу на момент паузи — при відновленні відлік продовжується
+ * рівно з того місця, а не рахується заново.
+ */
 class TimerDetailActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityTimerDetailBinding
@@ -60,6 +67,7 @@ class TimerDetailActivity : AppCompatActivity() {
         data.cycle = fresh.cycle
         data.endTimestamp = fresh.endTimestamp
         data.running = fresh.running
+        data.pausedRemainingMs = fresh.pausedRemainingMs
         refreshDisplay()
     }
 
@@ -69,13 +77,14 @@ class TimerDetailActivity : AppCompatActivity() {
         binding.totalLengthEdit.setText(fmtNum(data.totalLength))
         binding.alreadyPassedEdit.setText(fmtNum(data.alreadyPassed))
         if (data.speed > 0) {
-            binding.speedManualEdit.setText("%.3f".format(data.speed))
-            binding.speedInfoText.text = "Швидкість: ${"%.3f".format(data.speed)} м/с"
+            binding.speedManualEdit.setText("%.5f".format(data.speed))
+            binding.speedInfoText.text = getString(R.string.speed_info_manual_fmt, "%.5f".format(data.speed))
         }
 
-        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, SoundSignals.NAMES)
+        val signalNames = SoundSignals.names(this)
+        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, signalNames)
         binding.signalSpinner.adapter = adapter
-        binding.signalSpinner.setSelection(data.signalIndex.coerceIn(0, SoundSignals.NAMES.size - 1))
+        binding.signalSpinner.setSelection(data.signalIndex.coerceIn(0, signalNames.size - 1))
 
         binding.nameEdit.doAfterTextChanged {
             val v = it?.toString()
@@ -94,7 +103,7 @@ class TimerDetailActivity : AppCompatActivity() {
             val v = it?.toString()?.replace(',', '.')?.toDoubleOrNull()
             if (v != null && v > 0) {
                 data.speed = v
-                binding.speedInfoText.text = "Швидкість (вручну): ${"%.3f".format(v)} м/с"
+                binding.speedInfoText.text = getString(R.string.speed_info_manual_fmt, "%.5f".format(v))
                 persist()
             }
         }
@@ -105,7 +114,7 @@ class TimerDetailActivity : AppCompatActivity() {
         }
 
         binding.startButton.setOnClickListener { start() }
-        binding.pauseButton.setOnClickListener { pause() }
+        binding.pauseButton.setOnClickListener { togglePause() }
         binding.resetButton.setOnClickListener { reset() }
 
         refreshDisplay()
@@ -134,13 +143,15 @@ class TimerDetailActivity : AppCompatActivity() {
         val elapsedSec = (System.currentTimeMillis() - calibStartMs) / 1000.0
         val meters = binding.calibMetersEdit.text?.toString()?.replace(',', '.')?.toDoubleOrNull()
         if (meters == null || meters <= 0 || elapsedSec <= 0) {
-            Toast.makeText(this, "Введіть коректну кількість метрів (>0).", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.error_invalid_meters), Toast.LENGTH_SHORT).show()
             return
         }
         data.speed = meters / elapsedSec
-        binding.speedManualEdit.setText("%.3f".format(data.speed))
-        binding.speedInfoText.text =
-            "Швидкість: ${"%.3f".format(data.speed)} м/с (${fmtNum(meters)} м за ${"%.1f".format(elapsedSec)} с)"
+        binding.speedManualEdit.setText("%.5f".format(data.speed))
+        binding.speedInfoText.text = getString(
+            R.string.speed_info_calibrated_fmt,
+            "%.5f".format(data.speed), fmtNum(meters), "%.1f".format(elapsedSec)
+        )
         calibRunning = false
         binding.calibMarkButton.isEnabled = false
         binding.calibStartButton.isEnabled = true
@@ -149,17 +160,17 @@ class TimerDetailActivity : AppCompatActivity() {
 
     private fun computeFullTime(showError: Boolean): Double? {
         if (data.speed <= 0) {
-            if (showError) Toast.makeText(this, "Спершу визначте швидкість (замір або вручну).", Toast.LENGTH_SHORT).show()
+            if (showError) Toast.makeText(this, getString(R.string.error_no_speed), Toast.LENGTH_SHORT).show()
             return null
         }
         val totalLen = binding.totalLengthEdit.text?.toString()?.replace(',', '.')?.toDoubleOrNull()
         if (totalLen == null || totalLen <= 0) {
-            if (showError) Toast.makeText(this, "Введіть коректну довжину рулону (>0).", Toast.LENGTH_SHORT).show()
+            if (showError) Toast.makeText(this, getString(R.string.error_invalid_length), Toast.LENGTH_SHORT).show()
             return null
         }
         data.totalLength = totalLen
         val fullTime = totalLen / data.speed
-        binding.fullTimeInfoText.text = "Повний час рулону: ${TimeFmt.format(fullTime)}"
+        binding.fullTimeInfoText.text = getString(R.string.full_time_computed_fmt, TimeFmt.format(fullTime))
         persist()
         return fullTime
     }
@@ -172,10 +183,12 @@ class TimerDetailActivity : AppCompatActivity() {
         return remainingM / data.speed
     }
 
+    /** «Старт» завжди починає поточний цикл заново (ігнорує можливу паузу). */
     private fun start() {
         if (data.running) return
         val remainSec = if (data.cycle == 1) firstCycleTime() else computeFullTime(showError = true)
         if (remainSec == null) return
+        data.pausedRemainingMs = 0
         data.signalIndex = binding.signalSpinner.selectedItemPosition
         data.endTimestamp = System.currentTimeMillis() + Math.round(remainSec * 1000)
         data.running = true
@@ -187,9 +200,28 @@ class TimerDetailActivity : AppCompatActivity() {
         refreshDisplay()
     }
 
-    private fun pause() {
+    private fun togglePause() {
+        if (data.running) pauseTimer() else resumeTimer()
+    }
+
+    private fun pauseTimer() {
+        val remainingMs = (data.endTimestamp - System.currentTimeMillis()).coerceAtLeast(0)
+        data.pausedRemainingMs = remainingMs
         data.running = false
         AlarmReceiver.cancelAlarm(this, data.id)
+        persist()
+        refreshDisplay()
+    }
+
+    private fun resumeTimer() {
+        if (data.pausedRemainingMs <= 0) return
+        data.endTimestamp = System.currentTimeMillis() + data.pausedRemainingMs
+        data.pausedRemainingMs = 0
+        data.running = true
+        AlarmReceiver.scheduleAlarm(
+            this, data.id, data.name, data.speed, data.totalLength,
+            data.signalIndex, data.cycle + 1, data.endTimestamp
+        )
         persist()
         refreshDisplay()
     }
@@ -198,6 +230,7 @@ class TimerDetailActivity : AppCompatActivity() {
         data.running = false
         data.cycle = 1
         data.endTimestamp = 0
+        data.pausedRemainingMs = 0
         AlarmReceiver.cancelAlarm(this, data.id)
         persist()
         refreshDisplay()
@@ -219,27 +252,30 @@ class TimerDetailActivity : AppCompatActivity() {
 
     private fun tickUi() {
         if (!data.running) {
-            binding.startButton.isEnabled = true
-            binding.pauseButton.isEnabled = false
+            refreshDisplay()
             return
         }
         val remaining = (data.endTimestamp - System.currentTimeMillis()) / 1000.0
         if (remaining <= 0) {
-            // Alarm уже мав спрацювати у фоні й оновити сховище — підхоплюємо новий цикл
             syncFromStore()
         } else {
             binding.displayText.text = TimeFmt.format(remaining)
-            binding.cycleText.text = "Рулон №${data.cycle}"
+            binding.cycleText.text = getString(R.string.roll_label_fmt, data.cycle)
         }
     }
 
     private fun refreshDisplay() {
-        binding.startButton.isEnabled = !data.running
-        binding.pauseButton.isEnabled = data.running
-        binding.displayText.text = if (data.running) {
-            TimeFmt.format((data.endTimestamp - System.currentTimeMillis()) / 1000.0)
-        } else "--:--"
-        binding.cycleText.text = "Рулон №${data.cycle}"
+        val isPaused = !data.running && data.pausedRemainingMs > 0
+        binding.startButton.isEnabled = !data.running && !isPaused
+        binding.pauseButton.isEnabled = data.running || isPaused
+        binding.pauseButton.text = if (isPaused) getString(R.string.resume_button) else getString(R.string.pause_button)
+
+        binding.displayText.text = when {
+            data.running -> TimeFmt.format((data.endTimestamp - System.currentTimeMillis()) / 1000.0)
+            isPaused -> TimeFmt.format(data.pausedRemainingMs / 1000.0)
+            else -> "--:--"
+        }
+        binding.cycleText.text = getString(R.string.roll_label_fmt, data.cycle)
     }
 
     companion object {
