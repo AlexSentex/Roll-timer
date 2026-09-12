@@ -1,152 +1,123 @@
 package com.example.rolltimer
 
-import android.Manifest
 import android.app.AlarmManager
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.media.AudioManager
-import android.net.Uri
 import android.os.Build
-import android.os.Bundle
-import android.provider.Settings
-import android.view.View
-import android.widget.SeekBar
-import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.content.ContextCompat
-import androidx.core.os.LocaleListCompat
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import com.example.rolltimer.databinding.ActivitySettingsBinding
+import androidx.core.app.NotificationCompat
 
-class SettingsActivity : LocaleAwareActivity() {
+/**
+ * Спрацьовує навіть якщо застосунок закритий чи екран заблокований
+ * (якщо дозволено "Точні будильники" в системі). Грає сигнал, показує
+ * сповіщення (тап по ньому відкриває дешборд) і сам планує наступний
+ * цикл — уже на повний час рулону.
+ */
+class AlarmReceiver : BroadcastReceiver() {
 
-    private lateinit var binding: ActivitySettingsBinding
+    override fun onReceive(context: Context, intent: Intent) {
+        val id = intent.getStringExtra(EXTRA_ID) ?: return
+        val name = intent.getStringExtra(EXTRA_NAME) ?: context.getString(R.string.default_timer_name)
+        val speed = intent.getDoubleExtra(EXTRA_SPEED, 0.0)
+        val totalLength = intent.getDoubleExtra(EXTRA_TOTAL_LENGTH, 0.0)
+        val signalIndex = intent.getIntExtra(EXTRA_SIGNAL, 0)
+        val cycle = intent.getIntExtra(EXTRA_CYCLE, 1)
 
-    // Список підтримуваних мов: (тег локалі, назва мовою оригіналу).
-    // Щоб додати нову мову: сюди новий рядок + values-XX/strings.xml +
-    // рядок у app/src/main/res/xml/locales_config.xml.
-    private val languages = listOf(
-        "uk" to "Українська",
-        "en" to "English",
-        "lt" to "Lietuvių"
-    )
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivitySettingsBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        volumeControlStream = AudioManager.STREAM_MUSIC
-
-        binding.backButton.setOnClickListener { finish() }
-
-        setupLanguageSpinner()
-
-        binding.keepScreenSwitch.isChecked = SettingsStore.isKeepScreenOn(this)
-        binding.keepScreenSwitch.setOnCheckedChangeListener { _, checked ->
-            SettingsStore.setKeepScreenOn(this, checked)
+        SoundSignals.play(context, signalIndex)
+        if (SettingsStore.isNotificationsEnabled(context)) {
+            showNotification(context, id, name, cycle)
         }
 
-        binding.notificationsEnabledSwitch.isChecked = SettingsStore.isNotificationsEnabled(this)
-        binding.notificationsEnabledSwitch.setOnCheckedChangeListener { _, checked ->
-            SettingsStore.setNotificationsEnabled(this, checked)
+        val fullTimeMs = if (speed > 0) (totalLength / speed * 1000).toLong() else 0L
+        if (fullTimeMs > 0) {
+            val nextTrigger = System.currentTimeMillis() + fullTimeMs
+            scheduleAlarm(context, id, name, speed, totalLength, signalIndex, cycle + 1, nextTrigger)
+            TimerStore.updateOnFire(context, id, cycle + 1, nextTrigger)
+        } else {
+            TimerStore.markStopped(context, id)
+        }
+    }
+
+    private fun showNotification(context: Context, id: String, name: String, cycle: Int) {
+        val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                CHANNEL_ID, context.getString(R.string.notif_channel_name),
+                NotificationManager.IMPORTANCE_HIGH
+            )
+            nm.createNotificationChannel(channel)
         }
 
-        binding.notifButton.setOnClickListener { requestNotifPermission() }
-        binding.exactAlarmButton.setOnClickListener { requestExactAlarmPermission() }
-
-        val am = getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        val max = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
-        binding.volumeSeekBar.max = max
-        binding.volumeSeekBar.progress = am.getStreamVolume(AudioManager.STREAM_MUSIC)
-        binding.volumeSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                if (fromUser) am.setStreamVolume(AudioManager.STREAM_MUSIC, progress, 0)
-            }
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
-        })
-        binding.listenTestButton.setOnClickListener { SoundSignals.play(this, 0) }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        updateNotifUi()
-        updateExactAlarmUi()
-    }
-
-    private fun setupLanguageSpinner() {
-        val adapter = ArrayAdapter(
-            this, android.R.layout.simple_spinner_dropdown_item, languages.map { it.second }
+        val contentIntent = Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+        val contentPI = PendingIntent.getActivity(
+            context, id.hashCode(), contentIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-        binding.languageSpinner.adapter = adapter
 
-        val currentTag = AppCompatDelegate.getApplicationLocales()
-            .toLanguageTags()
-            .substringBefore("-")
-            .ifBlank { "uk" }
-        val currentIndex = languages.indexOfFirst { it.first == currentTag }.let { if (it >= 0) it else 0 }
-        binding.languageSpinner.setSelection(currentIndex)
+        val notification = NotificationCompat.Builder(context, CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_notification)
+            .setContentTitle(context.getString(R.string.notif_title_fmt, name))
+            .setContentText(context.getString(R.string.notif_text_fmt, cycle))
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setAutoCancel(true)
+            .setContentIntent(contentPI)
+            .build()
+        nm.notify(id.hashCode(), notification)
+    }
 
-        // Слухач ставимо ПІСЛЯ setSelection, щоб не спрацював одразу при відкритті екрана
-        binding.languageSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: android.view.View?, position: Int, id: Long) {
-                val tag = languages[position].first
-                AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(tag))
+    companion object {
+        const val CHANNEL_ID = "roll_timer_alerts"
+        const val EXTRA_ID = "id"
+        const val EXTRA_NAME = "name"
+        const val EXTRA_SPEED = "speed"
+        const val EXTRA_TOTAL_LENGTH = "total_length"
+        const val EXTRA_SIGNAL = "signal"
+        const val EXTRA_CYCLE = "cycle"
+
+        fun scheduleAlarm(
+            context: Context,
+            id: String,
+            name: String,
+            speed: Double,
+            totalLength: Double,
+            signalIndex: Int,
+            cycle: Int,
+            triggerAtMillis: Long
+        ) {
+            val am = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            val intent = Intent(context, AlarmReceiver::class.java).apply {
+                putExtra(EXTRA_ID, id)
+                putExtra(EXTRA_NAME, name)
+                putExtra(EXTRA_SPEED, speed)
+                putExtra(EXTRA_TOTAL_LENGTH, totalLength)
+                putExtra(EXTRA_SIGNAL, signalIndex)
+                putExtra(EXTRA_CYCLE, cycle)
             }
-            override fun onNothingSelected(parent: AdapterView<*>?) {}
-        }
-    }
-
-    private fun requestNotifPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
-                != PackageManager.PERMISSION_GRANTED
-            ) {
-                requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 101)
+            val pi = PendingIntent.getBroadcast(
+                context, id.hashCode(), intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+            val canExact = Build.VERSION.SDK_INT < Build.VERSION_CODES.S || am.canScheduleExactAlarms()
+            if (canExact) {
+                am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMillis, pi)
+            } else {
+                am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMillis, pi)
             }
         }
-        updateNotifUi()
-    }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int, permissions: Array<out String>, grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        updateNotifUi()
-    }
-
-    private fun updateNotifUi() {
-        val granted = Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
-                ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) ==
-                PackageManager.PERMISSION_GRANTED
-        if (granted) {
-            binding.notifStatusText.text = getString(R.string.notif_on)
-            binding.notifButton.visibility = View.GONE
-        } else {
-            binding.notifStatusText.text = getString(R.string.notif_off)
-            binding.notifButton.visibility = View.VISIBLE
-        }
-    }
-
-    private fun requestExactAlarmPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
-                data = Uri.parse("package:$packageName")
-            }
-            startActivity(intent)
-        }
-    }
-
-    private fun updateExactAlarmUi() {
-        val am = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val ok = Build.VERSION.SDK_INT < Build.VERSION_CODES.S || am.canScheduleExactAlarms()
-        if (ok) {
-            binding.exactAlarmStatusText.text = getString(R.string.exact_alarm_on)
-            binding.exactAlarmButton.visibility = View.GONE
-        } else {
-            binding.exactAlarmStatusText.text = getString(R.string.exact_alarm_off)
-            binding.exactAlarmButton.visibility = View.VISIBLE
+        fun cancelAlarm(context: Context, id: String) {
+            val am = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            val intent = Intent(context, AlarmReceiver::class.java)
+            val pi = PendingIntent.getBroadcast(
+                context, id.hashCode(), intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+            am.cancel(pi)
         }
     }
 }
