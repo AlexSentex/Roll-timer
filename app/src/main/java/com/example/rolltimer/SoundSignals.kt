@@ -18,26 +18,14 @@ import android.os.Looper
  * це змушує музику/подкасти або поставитись на паузу, або значно притишитись
  * на час сигналу, і відновитись одразу після. Гучність сигналу — з медіа-потоку,
  * на повну (в межах поточного рівня гучності медіа), щоб не губився серед звуку.
+ *
+ * Назви сигналів беруться з ресурсів (string-array signal_names) — щоб
+ * відповідати поточній мові застосунку.
  */
 object SoundSignals {
 
-    val NAMES = listOf(
-        "Три короткі гудки",
-        "Один довгий гудок",
-        "Висхідна трель (4 ноти)",
-        "Швидкі подвійні гудки",
-        "М'який подвійний сигнал",
-        "Спадна трель (4 ноти)",
-        "Два довгих гудки",
-        "П'ять швидких гудків",
-        "Дзвінок-трель",
-        "SOS (коротко-довго-коротко)",
-        "Висхідна гама (5 нот)",
-        "Спадна гама (5 нот)",
-        "Подвійний піп-піп",
-        "Акорд підтвердження",
-        "Чергування високий-низький"
-    )
+    fun names(context: Context): List<String> =
+        context.resources.getStringArray(R.array.signal_names).toList()
 
     // Триплет: (DTMF-цифра 0-9, тривалість мс, пауза після мс). Сума — 1-4 сек.
     private fun pattern(index: Int): List<Triple<Int, Int, Int>> = when (index) {
@@ -91,30 +79,40 @@ object SoundSignals {
         val steps = pattern(signalIndex)
         val am = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         val focusRequest = requestDuck(am)
-
-        val tg = try {
-            ToneGenerator(AudioManager.STREAM_MUSIC, 100)
-        } catch (e: Exception) {
-            releaseDuck(am, focusRequest)
-            return
-        }
-
         val handler = Handler(Looper.getMainLooper())
-        var delay = 0L
-        for ((digit, dur, gap) in steps) {
-            handler.postDelayed({
-                try { tg.startTone(dtmfToneType(digit), dur) } catch (e: Exception) { }
-            }, delay)
-            delay += dur + gap
-        }
+
+        // Тихо "розігріваємо" аудіотракт (найважливіше для Bluetooth-навушників):
+        // якщо звук довго не грав, з'єднанню/DAC потрібно ~150-300 мс, щоб
+        // підключитись, і без цього початок РЕАЛЬНОГО сигналу губиться.
+        // Тому спершу граємо майже нечутний тон, а вже потім — сам сигнал.
+        val warmup = try { ToneGenerator(AudioManager.STREAM_MUSIC, 1) } catch (e: Exception) { null }
+        try { warmup?.startTone(ToneGenerator.TONE_DTMF_1, 150) } catch (e: Exception) { }
+        val warmupDelay = 250L
+
         handler.postDelayed({
-            try { tg.release() } catch (e: Exception) { }
-            releaseDuck(am, focusRequest)
-        }, delay + 300)
+            try { warmup?.release() } catch (e: Exception) { }
+
+            val tg = try {
+                ToneGenerator(AudioManager.STREAM_MUSIC, 100)
+            } catch (e: Exception) {
+                releaseDuck(am, focusRequest)
+                return@postDelayed
+            }
+
+            var delay = 0L
+            for ((digit, dur, gap) in steps) {
+                handler.postDelayed({
+                    try { tg.startTone(dtmfToneType(digit), dur) } catch (e: Exception) { }
+                }, delay)
+                delay += dur + gap
+            }
+            handler.postDelayed({
+                try { tg.release() } catch (e: Exception) { }
+                releaseDuck(am, focusRequest)
+            }, delay + 300)
+        }, warmupDelay)
     }
 
-    // Просимо систему тимчасово забрати аудіофокус — інші плеєри самі
-    // поставлять на паузу або притишать себе на час сигналу.
     private fun requestDuck(am: AudioManager): Any? {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val attrs = AudioAttributes.Builder()
