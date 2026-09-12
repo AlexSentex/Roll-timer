@@ -41,6 +41,7 @@
     <string name="keep_screen_label">💡 Neleisti ekranui užgesti</string>
     <string name="notif_off">🔔 Pranešimai išjungti</string>
     <string name="notif_on">🔔 Pranešimai įjungti</string>
+    <string name="notifications_enabled_label">🔔 Rodyti pranešimus</string>
     <string name="allow_button">Leisti</string>
     <string name="exact_alarm_off">⏰ Tikslūs žadintuvai neleidžiami</string>
     <string name="exact_alarm_on">⏰ Tikslūs žadintuvai leidžiami</string>
