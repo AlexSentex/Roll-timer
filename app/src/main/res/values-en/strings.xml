@@ -1,0 +1,72 @@
+<resources>
+    <string name="app_name">Roll Timer</string>
+    <string name="default_timer_name">Timer</string>
+
+    <string name="dashboard_title">⏱ Roll Timers</string>
+    <string name="dashboard_empty">No timers yet.\nTap “+ Add timer” below.</string>
+    <string name="add_timer_button">+ Add timer</string>
+    <string name="roll_label_fmt">Roll #%1$d</string>
+    <string name="new_timer_default_name_fmt">Film %1$d</string>
+
+    <string name="back_button">← Back</string>
+    <string name="delete_button">Delete ✕</string>
+    <string name="name_hint">Timer name</string>
+    <string name="section_calibration">1. Speed calibration</string>
+    <string name="calib_start_button">Start measuring</string>
+    <string name="calib_meters_label">Passed, m:</string>
+    <string name="calib_mark_button">Mark</string>
+    <string name="speed_manual_label">or manually, m/s:</string>
+    <string name="speed_manual_hint">0.8</string>
+    <string name="speed_info_unknown">Speed: not set</string>
+    <string name="speed_info_calibrated_fmt">Speed: %1$s m/s (%2$s m in %3$s s)</string>
+    <string name="speed_info_manual_fmt">Speed (manual): %1$s m/s</string>
+    <string name="section_roll_params">2. Roll settings</string>
+    <string name="total_length_label">Length, m:</string>
+    <string name="already_passed_label">Already passed (1st cycle), m:</string>
+    <string name="meters_progress_fmt">%1$s / %2$s m</string>
+    <string name="compute_button">Calculate time</string>
+    <string name="full_time_unknown">Full roll time: —</string>
+    <string name="full_time_computed_fmt">Full roll time: %1$s</string>
+    <string name="section_signal">3. Signal</string>
+    <string name="listen_button">🔊 Listen</string>
+    <string name="start_button">▶ Start</string>
+    <string name="pause_button">⏸ Pause</string>
+    <string name="resume_button">▶ Resume</string>
+    <string name="reset_button">↺ Reset</string>
+    <string name="error_invalid_meters">Enter a valid number of meters (&gt;0).</string>
+    <string name="error_no_speed">First set the speed (measure or enter manually).</string>
+    <string name="error_invalid_length">Enter a valid roll length (&gt;0).</string>
+
+    <string name="settings_title">Settings</string>
+    <string name="keep_screen_label">💡 Keep screen on</string>
+    <string name="notif_off">🔔 Notifications off</string>
+    <string name="notif_on">🔔 Notifications on</string>
+    <string name="allow_button">Allow</string>
+    <string name="exact_alarm_off">⏰ Exact alarms not allowed</string>
+    <string name="exact_alarm_on">⏰ Exact alarms allowed</string>
+    <string name="volume_label">🔊 Signal volume (media)</string>
+    <string name="test_signal_button">🔊 Test signal</string>
+    <string name="language_label">🌐 Language</string>
+
+    <string name="notif_title_fmt">%1$s: roll finished</string>
+    <string name="notif_text_fmt">Time\'s up — time to change the roll (cycle %1$d).</string>
+    <string name="notif_channel_name">Roll timer alerts</string>
+
+    <string-array name="signal_names">
+        <item>Three short beeps</item>
+        <item>One long beep</item>
+        <item>Rising trill (4 notes)</item>
+        <item>Fast double beeps</item>
+        <item>Soft double signal</item>
+        <item>Falling trill (4 notes)</item>
+        <item>Two long beeps</item>
+        <item>Five quick beeps</item>
+        <item>Ring trill</item>
+        <item>SOS (short-long-short)</item>
+        <item>Rising scale (5 notes)</item>
+        <item>Falling scale (5 notes)</item>
+        <item>Double beep-beep</item>
+        <item>Confirmation chord</item>
+        <item>High-low alternation</item>
+    </string-array>
+</resources>
