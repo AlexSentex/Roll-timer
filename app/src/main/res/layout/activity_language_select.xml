@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="@color/colorBackground"
+    android:padding="24dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="🌐"
+        android:textSize="40sp"
+        android:layout_marginBottom="12dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textColor="@color/colorOnSurface"
+        android:textSize="17sp"
+        android:layout_marginBottom="24dp"
+        android:text="@string/choose_language_title" />
+
+    <Button
+        android:id="@+id/pickEnButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:backgroundTint="@color/colorPrimary"
+        android:textColor="#FFFFFF"
+        android:textAllCaps="false"
+        android:textSize="16sp"
+        android:text="English" />
+
+    <Button
+        android:id="@+id/pickUkButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:backgroundTint="@color/colorSurface"
+        android:textColor="@color/colorOnSurface"
+        android:textAllCaps="false"
+        android:textSize="16sp"
+        android:text="Українська" />
+
+    <Button
+        android:id="@+id/pickLtButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/colorSurface"
+        android:textColor="@color/colorOnSurface"
+        android:textAllCaps="false"
+        android:textSize="16sp"
+        android:text="Lietuvių" />
+
+</LinearLayout>
