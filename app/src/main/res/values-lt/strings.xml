@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">Roll Timer</string>
+    <string name="choose_language_prompt">Pasirinkite kalbą</string>
     <string name="default_timer_name">Laikmatis</string>
 
     <string name="dashboard_title">⏱ Ritinių laikmačiai</string>
@@ -38,6 +39,7 @@
     <string name="error_invalid_length">Įveskite teisingą ritinio ilgį (&gt;0).</string>
 
     <string name="settings_title">Nustatymai</string>
+    <string name="choose_language_title">Pasirinkite kalbą</string>
     <string name="keep_screen_label">💡 Neleisti ekranui užgesti</string>
     <string name="notif_off">🔔 Pranešimai išjungti</string>
     <string name="notif_on">🔔 Pranešimai įjungti</string>
