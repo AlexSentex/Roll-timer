@@ -32,6 +32,10 @@
             android:name=".SettingsActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".LanguageSelectActivity"
+            android:exported="false" />
+
         <receiver
             android:name=".AlarmReceiver"
             android:exported="false" />
