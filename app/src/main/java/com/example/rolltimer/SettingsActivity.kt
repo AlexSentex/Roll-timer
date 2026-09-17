@@ -27,8 +27,8 @@ class SettingsActivity : LocaleAwareActivity() {
     // Щоб додати нову мову: сюди новий рядок + values-XX/strings.xml +
     // рядок у app/src/main/res/xml/locales_config.xml.
     private val languages = listOf(
-        "uk" to "Українська",
         "en" to "English",
+        "uk" to "Українська",
         "lt" to "Lietuvių"
     )
 
@@ -84,7 +84,7 @@ class SettingsActivity : LocaleAwareActivity() {
         val currentTag = AppCompatDelegate.getApplicationLocales()
             .toLanguageTags()
             .substringBefore("-")
-            .ifBlank { "uk" }
+            .ifBlank { "en" }
         val currentIndex = languages.indexOfFirst { it.first == currentTag }.let { if (it >= 0) it else 0 }
         binding.languageSpinner.setSelection(currentIndex)
 
@@ -93,6 +93,7 @@ class SettingsActivity : LocaleAwareActivity() {
             override fun onItemSelected(parent: AdapterView<*>?, view: android.view.View?, position: Int, id: Long) {
                 val tag = languages[position].first
                 AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(tag))
+                SettingsStore.setLanguageChosen(this@SettingsActivity, true)
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
