@@ -20,6 +20,15 @@ class MainActivity : LocaleAwareActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Перший запуск — мову ще не обрано: показуємо окремий екран вибору
+        // мови й одразу виходимо, не малюючи дешборд.
+        if (!SettingsStore.isLanguageChosen(this)) {
+            startActivity(Intent(this, LanguageSelectActivity::class.java))
+            finish()
+            return
+        }
+
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
